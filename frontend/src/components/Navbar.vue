@@ -7,7 +7,9 @@
       </ul>
     </nav>
 
-    <img src="@/assets/profile-photo.jpg" alt="Personal Photo" class="profile-photo">
+    <router-link to="/editprofile">
+      <img src="@/assets/profile-photo.jpg" alt="Personal Photo" class="profile-photo">
+    </router-link>
   </header>
 </template>
 

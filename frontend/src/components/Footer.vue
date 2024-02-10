@@ -17,9 +17,8 @@
 }
 
 footer {
-  height: 50px;
+  height: 75px;
   background-color: #d8d8d8;
-  border-radius: 15px;
   margin-top: auto;
 }
 text {

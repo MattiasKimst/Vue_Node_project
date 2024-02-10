@@ -5,6 +5,7 @@ import LoginView from "../views/LoginView";
 import AddPostView from "../views/AddPostView";
 import ContactUsView from "../views/ContactUsView";
 import UpdatePostView from "../views/UpdatePostView.vue";
+import EditProfileView from "@/views/EditProfileView.vue";
 import store from "../store"; // Import your Vuex store
 
 const authGuard = (to, from, next) => {
@@ -50,6 +51,13 @@ const routes = [
         component: UpdatePostView,
         beforeEnter: authGuard,
     },
+    {
+        path: "/editprofile",
+        name: "editprofile",
+        component: EditProfileView,
+        beforeEnter: authGuard,
+    },
+
 ];
 
 const router = createRouter({

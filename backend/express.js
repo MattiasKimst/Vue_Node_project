@@ -94,6 +94,50 @@ app.post('/auth/signup', async(req, res) => {
     }
 });
 
+// Update user profile
+app.put('/api/profile', async (req, res) => {
+    try {
+        // Check authentication
+        if (!validateJwt(req.cookies)) {
+            return res.status(401).json({ status: "fail", message: "Not authenticated" });
+        }
+
+        // Retrieve data from request body
+        const { name, password } = req.body;
+        const userId = req.user.id; // Assuming you have middleware to decode JWT and add user to request object
+
+        // Check if name or password are provided
+        if (!name && !password) {
+            return res.status(400).json({ status: "fail", message: "Name or password must be provided for update" });
+        }
+
+        // Prepare the update query based on the provided data
+        let updateQuery = 'UPDATE users SET';
+        const queryParams = [];
+        if (name) {
+            updateQuery += ' name = $1';
+            queryParams.push(name);
+        }
+        if (password) {
+            const salt = await bcrypt.genSalt();
+            const bcryptPassword = await bcrypt.hash(password, salt);
+            if (name) updateQuery += ',';
+            updateQuery += ' password = $' + (queryParams.length + 1);
+            queryParams.push(bcryptPassword);
+        }
+        updateQuery += ' WHERE id = $' + (queryParams.length + 1);
+        queryParams.push(userId);
+
+        // Execute the update query
+        await pool.query(updateQuery, queryParams);
+
+        res.status(200).json({ status: "success", message: "Profile updated." });
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+});
+
+
 app.post('/auth/login', async(req, res) => {
     try {
         console.log("a login request has arrived");
