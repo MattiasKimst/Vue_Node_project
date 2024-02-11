@@ -7,8 +7,9 @@ This project is a full-stack web application built with Vue.js for the frontend,
 - Vue.js frontend with components for a responsive and interactive user interface.
 - Node.js backend providing RESTful APIs to interact with the database.
 - PostgreSQL database for storing and managing application data.
-- User authentication and authorization.
-- CRUD operations for managing resources.
+- User authentication and authorization using jwt tokens
+- CRUD operations for managing resources
+
 
 ## Prerequisites
 - Node.js and npm installed on your system.

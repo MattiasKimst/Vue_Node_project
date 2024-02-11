@@ -26,10 +26,10 @@ export default {
       formData.append("profilePicture", this.profilePicture);
 
       try {
-        const response = await fetch("/api/profile", {
+        const response = await fetch("http://localhost:3000/api/profile", {
           method: "PUT",
           body: formData,
-          // Add headers if needed, like authorization token
+
         });
 
         if (!response.ok) {
