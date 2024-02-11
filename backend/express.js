@@ -100,24 +100,22 @@ app.post('/auth/signup', async(req, res) => {
 // Update user profile
 app.put('/api/profile', upload.single('profilePicture'), async (req, res) => {
     try {
-        console.log('01. point')
+
         // Check authentication
         if(!validateJwt(req.cookies)) return res.status(401).json({status: "fail", message: "Not authenticated", posts: []});
 
-        console.log('02. point')
+
         const userId = req.user.id; // Assuming you have middleware to decode JWT and add user to request object
 
         if (!req.file) {
             return res.status(400).json({ status: "fail", message: "Profile picture file is required" });
         }
-        console.log('03. point')
 
-        console.log('1. point');
         const profilePicturePath = '/assets/' + req.file.filename; // the profile picture is stored in the assets folder with a unique filename
-        console.log('2. point')
+
         // Update the profile picture path in the database
         await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicturePath, userId]);
-        console.log('3. point')
+
         res.status(200).json({ status: "success", message: "Profile picture updated." });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });

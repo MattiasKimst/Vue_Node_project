@@ -21,15 +21,12 @@ export default {
     async updateProfile() {
       // Prepare form data
       const formData = new FormData();
-      formData.append("name", this.name);
-      formData.append("password", this.password);
       formData.append("profilePicture", this.profilePicture);
 
       try {
         const response = await fetch("http://localhost:3000/api/profile", {
           method: "PUT",
           body: formData,
-
         });
 
         if (!response.ok) {
@@ -37,12 +34,13 @@ export default {
         }
 
         // Handle success
-        console.log("Profile updated successfully");
+        console.log("Profile picture updated successfully");
       } catch (error) {
         console.error(error.message);
         // Handle error
       }
     },
+
 
     handleFileUpload(event) {
       this.profilePicture = event.target.files[0];
@@ -85,5 +83,6 @@ button {
   padding-right: 15px;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   font-size: 18px;
+  color: white;
 }
 </style>

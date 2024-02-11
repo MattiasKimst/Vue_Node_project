@@ -1,4 +1,5 @@
 <template>
+
     <div class="extraButtons">
         <button @click="logout">Log out</button>
     </div>
@@ -11,6 +12,7 @@
         <button @click="gotoAddPost">Add post</button>
         <button @click="deleteAllPosts">Delete all</button>
     </div>
+
 </template>
 
 <script>
@@ -75,12 +77,13 @@ export default {
 }
 
 .extraButtons {
+
     display: flex;
     align-items: center;
     justify-content: space-around;
-    margin: 10px;
     max-width: 800px; /* Adjust as needed for your design */
     margin: 0 auto;
+
 }
 
 .extraButtons > button{
@@ -94,6 +97,8 @@ export default {
   color: white;
   font-size: 20px ;
   margin-bottom: 30px;
+  margin-top: 20px;
 
 }
+
 </style>
