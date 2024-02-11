@@ -8,6 +8,9 @@ const e = require('express');
 
 const PORT = process.env.PORT || 3000;
 const SECRET = "@(jK6%!./GGa9b|c.Lf10-";
+const multer = require('multer');//for uploading files, in our case profile picture
+const upload = multer({ dest: 'assets/' }); // uploads will go to assets folder
+
 
 function generateJWT(userId) {
     return jwt.sign({id: userId}, SECRET, { expiresIn: 3600 });
@@ -95,7 +98,7 @@ app.post('/auth/signup', async(req, res) => {
 });
 
 // Update user profile
-app.put('/api/profile', async (req, res) => {
+app.put('/api/profile', upload.single('profilePicture'), async (req, res) => {
     try {
         // Check authentication
         if (!validateJwt(req.cookies)) {
@@ -125,6 +128,12 @@ app.put('/api/profile', async (req, res) => {
             updateQuery += ' password = $' + (queryParams.length + 1);
             queryParams.push(bcryptPassword);
         }
+        if (req.file) { // the profile picture is uploaded and stored in req.file
+            const profilePicturePath = '/assets/' + req.file.filename; // the profile picture is stored in the assets folder with a unique filename
+            if (name || password) updateQuery += ',';
+            updateQuery += ' profile_picture = $' + (queryParams.length + 1);
+            queryParams.push(profilePicturePath);
+        }
         updateQuery += ' WHERE id = $' + (queryParams.length + 1);
         queryParams.push(userId);
 
@@ -136,6 +145,7 @@ app.put('/api/profile', async (req, res) => {
         res.status(500).json({ status: "fail", message: error.message });
     }
 });
+
 
 
 app.post('/auth/login', async(req, res) => {
@@ -279,4 +289,11 @@ app.put("/api/posts/:postId", async (req, res) => {
     } catch (e) {
         res.status(500).json({ status: "fail", message: e.message });
     }
+});
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+// Define an endpoint to serve files based on file path
+app.get('/api/file/:filePath', (req, res) => {
+    const filePath = req.params.filePath;
+    res.sendFile(path.join(__dirname, 'assets', filePath));
 });

@@ -7,6 +7,9 @@ export default createStore({
         isAuthenticated: false,
         user: null,
         jwtToken: null,
+        userName: '', // Add property to store user's name
+        profilePictureUrl: '' // Add property to store profile picture URL
+
     },
     mutations: {
         resetAllLikes: (state) => {
@@ -36,6 +39,10 @@ export default createStore({
             state.user = user;
             state.isAuthenticated = true;
         },
+        setUserProfile(state, { userName, profilePictureUrl }) {
+            state.userName = userName;
+            state.profilePictureUrl = profilePictureUrl;
+        }
     },
     actions: {
         addLikeToPostAct: (act, args) => {
@@ -69,7 +76,13 @@ export default createStore({
 
                 if (response.ok) {
                     // Authentication successful, commit mutation to update state
-                    commit("authenticateUser", {user: data.user_id, jwtToken: null}); // Replace with your mutation
+                    commit("authenticateUser", { user: data.user_id, jwtToken: null }); // Replace with your mutation
+
+                    // Fetch user profile data to update username and profile picture
+                    await dispatch('fetchUserProfile');
+
+                    // Optionally, you can navigate to a different route after login
+                    // router.push('/dashboard'); // Replace with your route
                 } else {
                     // Authentication failed, handle error (e.g., show error message)
                     console.error("Login failed:", data.error);
@@ -78,11 +91,28 @@ export default createStore({
                 console.error("An error occurred during login:", error);
             }
         },
+        async fetchUserProfile({ commit }) {
+            try {
+                const response = await fetch('/api/userProfile'); // Replace with your actual API endpoint
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user profile');
+                }
+                const userProfile = await response.json();
+                commit('setUserProfile', {
+                    userName: userProfile.name,
+                    profilePictureUrl: userProfile.profilePictureUrl
+                });
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        }
     },
     getters: {
         isAuthenticated: (state) => state.isAuthenticated,
         user: (state) => state.user,
         jwtToken: (state) => state.jwtToken,
+        userName: (state) => state.userName,
+        profilePictureUrl: (state) => state.profilePictureUrl
     },
     modules: {},
 });

@@ -88,8 +88,8 @@ export default {
 }
 
 button {
-  border-radius: 15px;
-  background-color: #89b2e3;
+
+  background-color: #4a69bd;
   border: none;
   padding: 5px;
   padding-left: 15px;

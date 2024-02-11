@@ -22,9 +22,11 @@ const execute = async(query) => {
 //if such table does not exist, a table for storing user credentials will be created
 const createTblQuery = `
     CREATE TABLE IF NOT EXISTS "users" (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        email VARCHAR(200) NOT NULL UNIQUE,
-        password VARCHAR(200) NOT NULL 
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(200) NOT NULL UNIQUE,
+    password VARCHAR(200) NOT NULL,
+    name VARCHAR(100), 
+    profile_picture VARCHAR(200)//path to profile picture
     );`;
 execute(createTblQuery).then(result => {
     if (result) {
