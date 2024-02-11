@@ -1,6 +1,6 @@
 <template>
   <div class="post" @click="goToPostView">
-    <img src="@/assets/profile-photo.jpg" alt="Profile" height="40" width="40" />
+    <img src="../assets/profile-photo.jpg" alt="Profile" height="40" width="40" />
     <p class="post-date">{{ formatDate(postDate) }}</p>
     <p>{{ content }}</p>
   </div>
@@ -66,7 +66,7 @@ export default {
   .post .profile-photo {
       width: 20px;
       height: 20px;
-      background-image: url('@/assets/profile-photo.jpg');
+      background-image: url('../assets/profile-photo.jpg');
       background-size: cover;
       background-position: center;
       border-radius: 50%;

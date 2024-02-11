@@ -1,21 +1,10 @@
 <template>
   <form @submit.prevent="updateProfile" class="edit-profile-form">
     <div class="form-item">
-      <label for="name">Name</label>
-      <input v-model="name" type="text" id="name" placeholder="Name" required>
-    </div>
-
-    <div class="form-item">
-      <label for="password">Password</label>
-      <input v-model="password" type="password" id="password" placeholder="Password" required>
-    </div>
-
-    <div class="form-item">
       <label for="profile-picture">Profile Picture</label>
       <input type="file" id="profile-picture" @change="handleFileUpload">
     </div>
-
-    <button type="submit">Update Profile</button>
+    <button type="submit">Update Profile Picture</button>
   </form>
 </template>
 
@@ -24,8 +13,7 @@ export default {
   name: "EditProfile",
   data() {
     return {
-      name: "",
-      password: "",
+      profilePictureUrl: "", // Define profilePictureUrl property to hold the URL of the profile picture
       profilePicture: null
     };
   },
@@ -55,6 +43,7 @@ export default {
         // Handle error
       }
     },
+
     handleFileUpload(event) {
       this.profilePicture = event.target.files[0];
     },

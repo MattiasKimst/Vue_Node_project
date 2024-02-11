@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const e = require('express');
-
+const path = require('path');
 const PORT = process.env.PORT || 3000;
 const SECRET = "@(jK6%!./GGa9b|c.Lf10-";
 const multer = require('multer');//for uploading files, in our case profile picture
@@ -101,51 +101,24 @@ app.post('/auth/signup', async(req, res) => {
 app.put('/api/profile', upload.single('profilePicture'), async (req, res) => {
     try {
         // Check authentication
-        if (!validateJwt(req.cookies)) {
-            return res.status(401).json({ status: "fail", message: "Not authenticated" });
-        }
+        if(!validateJwt(req.cookies)) return res.status(401).json({status: "fail", message: "Not authenticated", posts: []});
 
-        // Retrieve data from request body
-        const { name, password } = req.body;
         const userId = req.user.id; // Assuming you have middleware to decode JWT and add user to request object
 
-        // Check if name or password are provided
-        if (!name && !password) {
-            return res.status(400).json({ status: "fail", message: "Name or password must be provided for update" });
+        if (!req.file) {
+            return res.status(400).json({ status: "fail", message: "Profile picture file is required" });
         }
 
-        // Prepare the update query based on the provided data
-        let updateQuery = 'UPDATE users SET';
-        const queryParams = [];
-        if (name) {
-            updateQuery += ' name = $1';
-            queryParams.push(name);
-        }
-        if (password) {
-            const salt = await bcrypt.genSalt();
-            const bcryptPassword = await bcrypt.hash(password, salt);
-            if (name) updateQuery += ',';
-            updateQuery += ' password = $' + (queryParams.length + 1);
-            queryParams.push(bcryptPassword);
-        }
-        if (req.file) { // the profile picture is uploaded and stored in req.file
-            const profilePicturePath = '/assets/' + req.file.filename; // the profile picture is stored in the assets folder with a unique filename
-            if (name || password) updateQuery += ',';
-            updateQuery += ' profile_picture = $' + (queryParams.length + 1);
-            queryParams.push(profilePicturePath);
-        }
-        updateQuery += ' WHERE id = $' + (queryParams.length + 1);
-        queryParams.push(userId);
+        const profilePicturePath = '/assets/' + req.file.filename; // the profile picture is stored in the assets folder with a unique filename
 
-        // Execute the update query
-        await pool.query(updateQuery, queryParams);
+        // Update the profile picture path in the database
+        await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicturePath, userId]);
 
-        res.status(200).json({ status: "success", message: "Profile updated." });
+        res.status(200).json({ status: "success", message: "Profile picture updated." });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
     }
 });
-
 
 
 app.post('/auth/login', async(req, res) => {
@@ -209,7 +182,7 @@ app.get("/api/posts", async (req, res) => {
 
 app.post("/api/posts", async (req, res) => {
     try {
-        //if(!validateJwt(req.cookies)) return res.status(401).json({status: "fail", message: "Not authenticated"});
+        if(!validateJwt(req.cookies)) return res.status(401).json({status: "fail", message: "Not authenticated"});
 
         let { content } = req.body;
         if(!content || content.length === 0) return res.status(401).json({status: "fail", message: "A post must have content"});

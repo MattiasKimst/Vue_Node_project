@@ -8,14 +8,23 @@
     </nav>
 
     <router-link to="/editprofile">
-      <img src="@/assets/profile-photo.jpg" alt="Personal Photo" class="profile-photo">
+      <img v-if="profilePictureUrl" :src="profilePictureUrl" alt="Profile Picture" class="profile-photo">
+      <img v-else src="@/assets/profile-photo.jpg" alt="Profile Picture" class="profile-photo">
     </router-link>
   </header>
 </template>
 
 <script>
 export default {
-  name: "Navbar"
+  name: "Navbar",
+  computed: {
+    user() {
+      return this.$store.state.user;
+    }
+  },
+  created() {
+    this.$store.dispatch('fetchUserProfile');
+  }
 }
 
 </script>

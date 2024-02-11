@@ -1,5 +1,5 @@
 // store/index.js
-import { createStore } from "vuex";
+import {createStore} from "vuex";
 
 export default createStore({
     state: {
@@ -25,7 +25,7 @@ export default createStore({
         setPosts: (state, args) => {
             state.posts = args.posts;
         },
-        authenticateUser: (state, { user, jwtToken }) => {
+        authenticateUser: (state, {user, jwtToken}) => {
             state.isAuthenticated = true;
             state.user = user;
             state.jwtToken = jwtToken;
@@ -39,7 +39,7 @@ export default createStore({
             state.user = user;
             state.isAuthenticated = true;
         },
-        setUserProfile(state, { userName, profilePictureUrl }) {
+        setUserProfile(state, {userName, profilePictureUrl}) {
             state.userName = userName;
             state.profilePictureUrl = profilePictureUrl;
         }
@@ -54,13 +54,13 @@ export default createStore({
         setPostsAct: (act, args) => {
             act.commit("setPosts", args);
         },
-        authenticateUserAct: (act, { user, jwtToken }) => {
-            act.commit("authenticateUser", { user, jwtToken });
+        authenticateUserAct: (act, {user, jwtToken}) => {
+            act.commit("authenticateUser", {user, jwtToken});
         },
         logoutAct: (act) => {
             act.commit("logout");
         },
-        async login({ commit }, credentials) {
+        async login({commit, dispatch}, credentials) { // Add 'dispatch' to the arguments
             try {
                 // Make API request to authenticate the user
                 // Example: replace with your actual API endpoint
@@ -76,7 +76,7 @@ export default createStore({
 
                 if (response.ok) {
                     // Authentication successful, commit mutation to update state
-                    commit("authenticateUser", { user: data.user_id, jwtToken: null }); // Replace with your mutation
+                    commit("authenticateUser", {user: data.user_id, jwtToken: null}); // Replace with your mutation
 
                     // Fetch user profile data to update username and profile picture
                     await dispatch('fetchUserProfile');
@@ -91,9 +91,10 @@ export default createStore({
                 console.error("An error occurred during login:", error);
             }
         },
-        async fetchUserProfile({ commit }) {
+
+        async fetchUserProfile({commit}) {
             try {
-                const response = await fetch('/api/userProfile'); // Replace with your actual API endpoint
+                const response = await fetch('/api/userProfile');
                 if (!response.ok) {
                     throw new Error('Failed to fetch user profile');
                 }

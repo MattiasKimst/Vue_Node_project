@@ -26,7 +26,7 @@ const createTblQuery = `
     email VARCHAR(200) NOT NULL UNIQUE,
     password VARCHAR(200) NOT NULL,
     name VARCHAR(100), 
-    profile_picture VARCHAR(200)//path to profile picture
+    profile_picture VARCHAR(200)
     );`;
 execute(createTblQuery).then(result => {
     if (result) {
