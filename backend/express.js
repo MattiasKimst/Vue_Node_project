@@ -5,11 +5,8 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const e = require('express');
-const path = require('path');
-const PORT = process.env.PORT || 3000;
 const SECRET = "@(jK6%!./GGa9b|c.Lf10-";
-const multer = require('multer');//for uploading files, in our case profile picture
-const upload = multer({ dest: 'assets/' }); // uploads will go to assets folder
+const PORT = process.env.PORT || 3000;
 
 
 function generateJWT(userId) {
@@ -48,7 +45,7 @@ app.get('/auth/authenticate', async(req, res) => {
     try {
         if (token) { //checks if the token exists
             //jwt.verify(token, secretOrPublicKey, [options, callback]) verify a token
-            await jwt.verify(token, secret, (err) => { //token exists, now we try to verify it
+            await jwt.verify(token, SECRET, (err) => { //token exists, now we try to verify it
                 if (err) { // not verified, redirect to login page
                     console.log(err.message);
                     console.log('token is not verified');
@@ -97,30 +94,58 @@ app.post('/auth/signup', async(req, res) => {
     }
 });
 
-// Update user profile
+const multer = require('multer'); //for uploading files, in our case profile picture
+const path = require('path'); // for creating file paths
+
+// Configure Multer to store files in the assets folder
+const upload = multer({
+    dest: 'assets/', // Change this path if needed
+    fileFilter: (req, file, cb) => { // Validate file type (optional)
+        const allowedMimes = ['image/jpeg', 'image/png'];
+        if (allowedMimes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only images allowed.'), false);
+        }
+    },
+});
+
+const fs = require('fs');
+
+
 app.put('/api/profile', upload.single('profilePicture'), async (req, res) => {
     try {
+        // Check authentication (TODO)
 
-        // Check authentication
-        if(!validateJwt(req.cookies)) return res.status(401).json({status: "fail", message: "Not authenticated", posts: []});
-
-
-        const userId = req.user.id; // Assuming you have middleware to decode JWT and add user to request object
-
+        // Check if a file was uploaded
         if (!req.file) {
             return res.status(400).json({ status: "fail", message: "Profile picture file is required" });
         }
 
-        const profilePicturePath = '/assets/' + req.file.filename; // the profile picture is stored in the assets folder with a unique filename
+        // Generate a unique filename for the uploaded image
+        const filename = req.file.filename + path.extname(req.file.originalname);
 
-        // Update the profile picture path in the database
-        await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicturePath, userId]);
+        // Move the uploaded file to the assets folder with the new filename
+        fs.rename(req.file.path, `assets/${filename}`, async (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ status: "fail", message: "Failed to move file" });
+            }
 
-        res.status(200).json({ status: "success", message: "Profile picture updated." });
+            // Update the profile picture path in the database
+            // Assuming `userId` is defined somewhere in the code
+            await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [filename, userId]);
+
+            // Respond with success message
+            res.status(200).json({ status: "success", message: "Profile picture updated." });
+        });
     } catch (error) {
+        // If an error occurs, log it and respond with an error message
+        console.error(error.message);
         res.status(500).json({ status: "fail", message: error.message });
     }
 });
+
 
 
 app.post('/auth/login', async(req, res) => {

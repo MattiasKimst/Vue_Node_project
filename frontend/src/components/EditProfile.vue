@@ -2,7 +2,14 @@
   <form @submit.prevent="updateProfile" class="edit-profile-form">
     <div class="form-item">
       <label for="profile-picture">Profile Picture</label>
-      <input type="file" id="profile-picture" @change="handleFileUpload">
+      <input
+          type="file"
+          id="profile-picture"
+          accept="image/*"
+          required
+          @change="handleFileUpload"
+      >
+      <img v-if="profilePicture" :src="createObjectURL(profilePicture)" alt="Preview" />
     </div>
     <button type="submit">Update Profile Picture</button>
   </form>
@@ -14,7 +21,7 @@ export default {
   data() {
     return {
       profilePictureUrl: "", // Define profilePictureUrl property to hold the URL of the profile picture
-      profilePicture: null
+      profilePicture: null,
     };
   },
   methods: {
@@ -30,59 +37,29 @@ export default {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to update profile");
+          throw new Error(`Failed to update profile: ${await response.text()}`);
         }
 
         // Handle success
         console.log("Profile picture updated successfully");
       } catch (error) {
         console.error(error.message);
-        // Handle error
+        // Handle and display the error to the user
       }
     },
 
-
     handleFileUpload(event) {
       this.profilePicture = event.target.files[0];
+
+      // Optionally display a preview if you implemented it
+      // if (this.profilePicture) {
+      //   this.profilePictureUrl = URL.createObjectURL(this.profilePicture);
+      // }
+    },
+
+    createObjectURL(file) {
+      return URL.createObjectURL(file);
     },
   },
 };
 </script>
-
-<style scoped>
-.edit-profile-form {
-  text-align: center;
-  width: 400px;
-  margin: auto;
-}
-
-.form-item {
-  margin: 10px;
-  text-align: left;
-}
-
-.form-item label {
-  margin-bottom: 5px;
-  display: inline-block;
-  width: 30%;
-}
-
-.form-item input {
-  padding: 8px;
-  box-sizing: border-box;
-  display: inline-block;
-  width: 70%;
-}
-
-button {
-
-  background-color: #4a69bd;
-  border: none;
-  padding: 5px;
-  padding-left: 15px;
-  padding-right: 15px;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  color: white;
-}
-</style>
